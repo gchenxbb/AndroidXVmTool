@@ -18,6 +18,7 @@ public class MainActivity extends Activity {
         classLoaderLog();
         TextView mTextView = findViewById(R.id.classloader);
         mTextView.setText(Html.fromHtml(stringBuilder.toString()));
+
 }
 
     public void classLoaderLog() {
@@ -31,18 +32,17 @@ public class MainActivity extends Activity {
             stringBuilder.append("<font color=\"#FE6026\">Context内部的类加载器：</font>\n");
             stringBuilder.append(parent.toString() + "\n");
 
-            //dalvik.system.PathClassLoader加载器
+            //ClassLoader内部SystemClassLoader，dalvik.system.PathClassLoader加载器
             ClassLoader systemLoader = ClassLoader.getSystemClassLoader();
             Log.d(TAG, systemLoader.toString());
-            stringBuilder.append("<font color=\"#FE6026\">SystemClassLoader系统类类加载器：</font>\n");
+            stringBuilder.append("<font color=\"#FE6026\">ClassLoader内部SystemClassLoader类加载器：</font>\n");
             stringBuilder.append(systemLoader.toString() + "\n");
 
             if (systemLoader.getParent() != null) {
-                //java.lang.BootClassLoader加载器
                 ClassLoader bootLoader = systemLoader.getParent();
                 if (bootLoader != null) {
                     Log.d(TAG, bootLoader.toString());
-                    stringBuilder.append("<font color=\"#FE6026\">系统类的父类加载器：</font>\n");
+                    stringBuilder.append("<font color=\"#FE6026\">SystemClassLoader的父类加载器：</font>\n");
                     stringBuilder.append(bootLoader.toString() + "\n");
                 }
             }
@@ -71,6 +71,13 @@ public class MainActivity extends Activity {
             Log.d(TAG, helloLoader);
             stringBuilder.append("<font color=\"#FE6026\">Hello.class的加载器：</font>\n");
             stringBuilder.append(helloLoader + "\n");
+
+            //dalvik.system.PathClassLoader，用户类的加载器
+            String MainActivityLoader = MainActivity.class.getClassLoader().toString();
+            Log.d(TAG, MainActivityLoader);
+            stringBuilder.append("<font color=\"#FE6026\">MainActivity.class的加载器：</font>\n");
+            stringBuilder.append(MainActivityLoader + "\n");
+
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
