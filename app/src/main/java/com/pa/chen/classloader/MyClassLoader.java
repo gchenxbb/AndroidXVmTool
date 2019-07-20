@@ -8,8 +8,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import dalvik.system.DexClassLoader;
+
+/**
+ * 自定义类加载器
+ */
 public class MyClassLoader extends ClassLoader {
-    public static final String TAG="MyClassLoader";
+    public DexClassLoader dexClassLoader;
+    public static final String TAG = "MyClassLoader";
     public static final String driver = Environment.getExternalStorageDirectory()
             .getAbsolutePath() + File.separator;
     public static final String fileTyep = ".class";
@@ -22,7 +28,7 @@ public class MyClassLoader extends ClassLoader {
         //加载器也需要被加载哟
         //他的类加载器是
         Log.d(TAG, "MyClassLoader:" + MyClassLoader.class.getClassLoader().toString());
-}
+    }
 
     //暂时注释，Dalvik虚拟机里走不通,不支持class
     // dexpath目前只支持“.dex”、“.jar”、“.apk”、“.zip”
@@ -51,4 +57,7 @@ public class MyClassLoader extends ClassLoader {
         }
         return data;
     }
+
+
+
 }

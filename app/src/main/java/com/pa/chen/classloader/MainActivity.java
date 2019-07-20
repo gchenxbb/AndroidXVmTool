@@ -1,104 +1,147 @@
 package com.pa.chen.classloader;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.res.AssetFileDescriptor;
 import android.os.Bundle;
+import android.os.Environment;
 import android.text.Html;
 import android.util.Log;
 import android.widget.TextView;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Method;
+
+import dalvik.system.DexClassLoader;
+
 
 public class MainActivity extends Activity {
+
     public static final String TAG = "MainActivity";
-    StringBuilder stringBuilder = new StringBuilder();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        classLoaderLog();
         TextView mTextView = findViewById(R.id.classloader);
-        mTextView.setText(Html.fromHtml(stringBuilder.toString()));
+        mTextView.setText(new LoadClassLoader().parseStrClassLoader());
 
-}
+        loadAsseFile();
 
-    public void classLoaderLog() {
+//        Hello hello = new Hello();
+    }
+
+
+    public byte[] loadAsseFile() {
+        String root = Environment.getExternalStorageDirectory().getAbsolutePath();
+        String[] files = null;
         try {
-            // 获取classes的dexElements
-            Class<?> cl = Class.forName("dalvik.system.BaseDexClassLoader");
 
-            //Context内部的类加载器：dalvik.system.PathClassLoader加载器
-            ClassLoader parent = Util.getContext().getClassLoader();
-            Log.d(TAG, parent.toString());
-            stringBuilder.append("<font color=\"#FE6026\">Context内部的类加载器：</font>\n");
-            stringBuilder.append(parent.toString() + "\n");
-
-            //ClassLoader内部SystemClassLoader，dalvik.system.PathClassLoader加载器
-            ClassLoader systemLoader = ClassLoader.getSystemClassLoader();
-            Log.d(TAG, systemLoader.toString());
-            stringBuilder.append("<font color=\"#FE6026\">ClassLoader内部SystemClassLoader类加载器：</font>\n");
-            stringBuilder.append(systemLoader.toString() + "\n");
-
-            if (systemLoader.getParent() != null) {
-                ClassLoader bootLoader = systemLoader.getParent();
-                if (bootLoader != null) {
-                    Log.d(TAG, bootLoader.toString());
-                    stringBuilder.append("<font color=\"#FE6026\">SystemClassLoader的父类加载器：</font>\n");
-                    stringBuilder.append(bootLoader.toString() + "\n");
+            files = getAssets().list("");
+            for (int i = 0; i < files.length; i++) {
+                String fileName = files[i];
+                Log.d(TAG, fileName);
+                if (fileName.contains(".apk")) {
+                    String destPath = root + "/androidclassLoader/";
+                    String destFileName = "temp.apk";
+                    if (copyFileFromAssets(this, fileName, destPath, destFileName)) {
+                        String dexfileName = root + "/androidclassLoader/" + "dex";
+                        File dexOutputDir = new File(dexfileName);
+                        if (!dexOutputDir.exists()) {
+                            dexOutputDir.mkdirs();
+                        }
+                        String mNativeLibDirName = root + "/androidclassLoader/" + "lib";
+                        File mNativeLibDir = new File(mNativeLibDirName);
+                        if (!mNativeLibDir.exists()) {
+                            mNativeLibDir.mkdirs();
+                        }
+//                        File dexOutputDir = getDir(destPath + "dex", Context.MODE_PRIVATE);
+                        String dexOutputPath = dexOutputDir.getAbsolutePath();
+//                        String mNativeLibDir = getDir(destPath + "lib", Context.MODE_PRIVATE).getAbsolutePath();
+                        DexClassLoader classLoader = new DexClassLoader(destPath + destFileName, dexOutputPath, mNativeLibDirName, getClassLoader());
+                        Class<?> clazz = null;
+                        try {
+                            clazz = Class.forName("com.android.myapp.Hello", true, classLoader);
+                        } catch (ClassNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                        if (clazz == null) {
+                            Log.d(TAG, "load hello,class,error!");
+                        } else {
+                            try {
+                                Object object = clazz.newInstance();
+                                Method method = clazz.getMethod("helloV");
+                                method.invoke(object);
+//                                hello.helloV();
+                            } catch (Exception e) {
+                                Log.d(TAG, "load hello,object,error!");
+                            }
+                        }
+                    }
                 }
+
             }
-
-            //dalvik.system.PathClassLoader当前类加载器
-            String currentLoader = Thread.currentThread().getContextClassLoader().toString();
-            Log.d(TAG, currentLoader);
-            stringBuilder.append("<font color=\"#FE6026\">当前线程类加载器：</font>\n");
-            stringBuilder.append(currentLoader + "\n");
-
-            stringBuilder.append("<font color=\"#FE6026\">Class的加载器：</font>\n");
-            //java.lang.BootClassLoader系统类System的加载器
-            String sysBootLoader = System.class.getClassLoader().toString();
-            Log.d(TAG, sysBootLoader);
-            stringBuilder.append("<font color=\"#FE6026\">System.class的加载器：</font>\n");
-            stringBuilder.append(sysBootLoader + "\n");
-
-            //java.lang.BootClassLoader系统class的加载器
-            String actBootLoader = Activity.class.getClassLoader().toString();
-            Log.d(TAG, actBootLoader);
-            stringBuilder.append("<font color=\"#FE6026\">Activity.class的加载器：</font>\n");
-            stringBuilder.append(actBootLoader + "\n");
-
-            //dalvik.system.PathClassLoader，用户类的加载器
-            String helloLoader = Hello.class.getClassLoader().toString();
-            Log.d(TAG, helloLoader);
-            stringBuilder.append("<font color=\"#FE6026\">Hello.class的加载器：</font>\n");
-            stringBuilder.append(helloLoader + "\n");
-
-            //dalvik.system.PathClassLoader，用户类的加载器
-            String MainActivityLoader = MainActivity.class.getClassLoader().toString();
-            Log.d(TAG, MainActivityLoader);
-            stringBuilder.append("<font color=\"#FE6026\">MainActivity.class的加载器：</font>\n");
-            stringBuilder.append(MainActivityLoader + "\n");
-
-        } catch (ClassNotFoundException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
-
-//        //自定义加载类加载器
-//        MyClassLoader cl1 = new MyClassLoader();
-//        try {
-//            //加载,用以下Hello转换成jar
-//            Class c1 = cl1.loadClass("Hello");
-//            String object = c1.newInstance().getClass().toString();
-//            Log.d("Hello", object);
-//        } catch (ClassNotFoundException e) {
-//            e.printStackTrace();
-//            Log.d(TAG, "main-ClassNotFoundException");
-//        } catch (IllegalAccessException e) {
-//            e.printStackTrace();
-//        } catch (InstantiationException e) {
-//            e.printStackTrace();
-//        }
-
-
+        return null;
     }
+
+    //copy文件，从assets到sdk卡
+    public boolean copyFileFromAssets(Context context, String apkName, String path, String fileName) {
+        boolean flag = false;
+        int BUFFER = 10240;
+        BufferedInputStream in = null;
+        BufferedOutputStream out = null;
+        AssetFileDescriptor fileDescriptor = null;
+        byte b[] = null;
+        try {
+            InputStream inputStream = getAssets().open(apkName);
+            File dir = new File(path);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+            File file = new File(path + fileName);
+            if (file.exists()) {
+                file.delete();
+            }
+
+            in = new BufferedInputStream(inputStream, BUFFER);
+            boolean isOK = file.createNewFile();
+            if (isOK) {
+                out = new BufferedOutputStream(new FileOutputStream(file), BUFFER);
+                b = new byte[BUFFER];
+                int read = 0;
+                while ((read = in.read(b)) > 0) {
+                    out.write(b, 0, read);
+                }
+                flag = true;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (out != null) {
+                    out.close();
+                }
+                if (in != null) {
+                    in.close();
+                }
+                if (fileDescriptor != null) {
+                    fileDescriptor.close();
+                }
+            } catch (IOException e) {
+            }
+        }
+        return flag;
+    }
+
 
 }

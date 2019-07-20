@@ -6,11 +6,11 @@ public class Hello {
 
     public Hello() {
         super();
-        Log.d("Hello", "hello class loader is " + Hello.class.getClassLoader());
+        Log.d("MainActivity", "hello class loader is " + Hello.class.getClassLoader());
     }
 
     public void helloV() {
-        Log.d("Hello", "say Hello");
+        Log.d("MainActivity", "say Hello");
     }
 
 
