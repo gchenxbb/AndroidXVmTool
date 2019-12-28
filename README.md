@@ -1,6 +1,10 @@
 Android的ClassLoader
 加载的是dex文件。
 
+技术文档
+
+[双亲委派模型](https://www.jianshu.com/p/74685bdddf22)
+
 #### 系统加载器
 BootClassLoader，Java实现，同一个包才可以访问，App无法访问
 DexClassLoader，继承BaseDexClassLoader，加载dex文件，apk，jar文件。最终都是要加载dex文件。
