@@ -1,4 +1,4 @@
-package com.pa.chen.classloader;
+package com.classloader.app;
 
 import android.os.Environment;
 import android.util.Log;
@@ -12,8 +12,11 @@ import dalvik.system.DexClassLoader;
 
 /**
  * 自定义类加载器
+ * 目标，可以加载apk外部的类，包括apk，dex等，类似DexClassLoader
+ * Dalvik虚拟机不支持class文件，直接加载class走不通。
  */
 public class MyClassLoader extends ClassLoader {
+
     public DexClassLoader dexClassLoader;
     public static final String TAG = "MyClassLoader";
     public static final String driver = Environment.getExternalStorageDirectory()
@@ -25,18 +28,22 @@ public class MyClassLoader extends ClassLoader {
     }
 
     public MyClassLoader() {
-        //加载器也需要被加载哟
-        //他的类加载器是
-        Log.d(TAG, "MyClassLoader:" + MyClassLoader.class.getClassLoader().toString());
+        //自定义的加载器也需要被加载哟，它的类加载器是PathClassLoader
+        ClassLoader classLoader = MyClassLoader.class.getClassLoader();
+        Log.d(TAG, "MyClassLoader:" + classLoader.getClass().getName());
     }
 
-    //暂时注释，Dalvik虚拟机里走不通,不支持class
-    // dexpath目前只支持“.dex”、“.jar”、“.apk”、“.zip”
+    //dexpath目前只支持“.dex”、“.jar”、“.apk”、“.zip”
+    @Override
     public Class findClass(String name) {
         byte[] data = loadClassData(name);
+        if (data == null) {
+            return null;
+        }
         return defineClass(data, 0, data.length);
     }
 
+    //加载外部jar文件
     public byte[] loadClassData(String name) {
         FileInputStream fis = null;
         byte[] data = null;
@@ -57,7 +64,4 @@ public class MyClassLoader extends ClassLoader {
         }
         return data;
     }
-
-
-
 }

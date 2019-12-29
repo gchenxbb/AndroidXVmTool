@@ -10,6 +10,12 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <Button
+            android:id="@+id/btn_classloader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="加载apk外部类" />
+
         <TextView
             android:id="@+id/classloader"
             android:layout_width="match_parent"

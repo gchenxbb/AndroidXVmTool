@@ -1,9 +1,9 @@
-package com.pa.chen.classloader;
+package com.classloader.app;
 
 import android.content.Context;
 
+
 public class Util {
-    //ApplicationContext由Utils掌管
     private static Context context;
     /*
      * 初始化

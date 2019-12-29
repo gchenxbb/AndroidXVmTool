@@ -11,7 +11,7 @@ DexClassLoader，继承BaseDexClassLoader，加载dex文件，apk，jar文件。
 参数optimizedDirectory是解压dex文件的内部存储路径，私有路径/data/data/<Package Name>/..,
 PathClassLoader，继承BaseDexClassLoader，默认参数optimizedDirectory是/data/dalvik_cache，加载已安装的apk的dex文件，存储在该路径。
 
-MainActivity.class,Hello.class的加载器是PathClassLoader。
+凡是apk中用户定义的类，MainActivity.class,Hello.class的加载器都是PathClassLoader。
 路径是
 dalvik.system.PathClassLoader[DexPathList[[zip file "/data/app/com.pa.chen.classloader-YA45x9vXJeZnGEbKV2Cm5w==/base.apk", 
 zip file "/data/app/com.pa.chen.classloader-YA45x9vXJeZnGEbKV2Cm5w==/split_lib_dependencies_apk.apk",
@@ -27,8 +27,8 @@ zip file "/data/app/com.pa.chen.classloader-YA45x9vXJeZnGEbKV2Cm5w==/split_lib_s
 zip file "/data/app/com.pa.chen.classloader-YA45x9vXJeZnGEbKV2Cm5w==/split_lib_slice_9_apk.apk"],
 nativeLibraryDirectories=[/data/app/com.pa.chen.classloader-YA45x9vXJeZnGEbKV2Cm5w==/lib/arm64, /system/lib64, /vendor/lib64]]]
 
-Activity.class，Context.class，System.class的加载器是BootClassLoader。
+凡是系统类，Activity.class，Context.class，System.class的加载器都是BootClassLoader。
 
-android源码26api，ClassLoader内部SystemClassLoader存储的加载器是PathClassLoader。父类加载器是BootClassLoader。
+android源码26api，ClassLoader静态内部类SystemClassLoader中存储的加载器loader是PathClassLoader。父类加载器是BootClassLoader。
 
 ContextImpl内部加载器来自LoadedApk的getClassLoader。LoadApk是空则来自ClassLoader内部SystemClassLoader。

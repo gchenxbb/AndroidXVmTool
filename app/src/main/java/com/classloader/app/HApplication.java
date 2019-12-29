@@ -1,7 +1,6 @@
-package com.pa.chen.classloader;
+package com.classloader.app;
 
 import android.app.Application;
-
 
 public class HApplication extends Application {
 

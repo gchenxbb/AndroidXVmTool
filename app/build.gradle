@@ -1,11 +1,11 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 28
     defaultConfig {
-        applicationId "com.pa.chen.classloader"
-        minSdkVersion 23
-        targetSdkVersion 26
+        applicationId "com.classloader.app"
+        minSdkVersion 19
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
     }
@@ -20,8 +20,6 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
-
-
-
-
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    api 'pub.devrel:easypermissions:3.0.0'
 }
