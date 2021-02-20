@@ -32,3 +32,29 @@ nativeLibraryDirectories=[/data/app/com.pa.chen.classloader-YA45x9vXJeZnGEbKV2Cm
 android源码26api，ClassLoader静态内部类SystemClassLoader中存储的加载器loader是PathClassLoader。父类加载器是BootClassLoader。
 
 ContextImpl内部加载器来自LoadedApk的getClassLoader。LoadApk是空则来自ClassLoader内部SystemClassLoader。
+
+
+
+# memory
+
+统计当前app节点对象。
+
+
+Shallow Size
+对象本身占有内存大小，不包含其引用的对象，，
+
+20字节
+
+3个4字节基础类型  12
+
+
+4byte(对象头) + 4byte(类型指针) 代表什么
+
+
+
+在 sdk21以后 也就是Android5.0系统以后，GOOGLE在Object类中加入了2个字段
+
+*   private transient Class<?> shadow$_klass_;  
+*   private transient int shadow$_monitor_;  
+
+native size：8.0之后的手机会显示，主要反应Bitmap所使用的像素内存（8.0之后，转移到了native）
